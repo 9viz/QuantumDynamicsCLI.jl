@@ -64,3 +64,8 @@ The primary focus of the qdsim application provided by the QuantumDynamicsCLI.jl
 - Multichromophore Incoherest Forster Resonance Energy Transfer [forsterZwischenmolekulareEnergiewanderungUnd1948, jangMultichromophoricForsterResonance2004](@cite)
 - Bloch-Redfield Master Equation
 - Transfer Tensor Method [cerrilloNonMarkovianDynamicalMaps2014](@cite) coupled with any of the path integral methods
+- Mapping Hamiltonian based semiclassical methods:
+	- Quasiclassical / Linearized Semiclassical dynamics (LSC)
+	- Partial Linearized Density Matrix dynamics (PLDM)
+	- Spin-mapped LSC
+	- Spin-mapped PLDM

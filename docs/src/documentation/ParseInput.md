@@ -56,10 +56,24 @@ Various methods of simulation are supported:
 - Multichromophore Incoherest Forster Resonance Energy Transfer [forsterZwischenmolekulareEnergiewanderungUnd1948, jangMultichromophoricForsterResonance2004](@cite)
 - Bloch-Redfield Master Equation
 - Transfer Tensor Method (TTM) [cerrilloNonMarkovianDynamicalMaps2014](@cite) coupled with any of the path integral methods
+- Mapping Hamiltonian based semiclassical methods:
+	- Quasiclassical / Linearized Semiclassical dynamics (LSC)
+	- Partial Linearized Density Matrix dynamics (PLDM)
+	- Spin-mapped version of LSC (Spin-LSC)
+	- Spin-mapped version of PLDM (Spin-PLDM)
 
 All of these dynamics methods require some core common parameters and then more specfic method-dependent parameters. The core parameters of all the dynamics methods are:
 - `dt`: for the time-step in the units specified in the system file
 - `nsteps`: for the number of steps of simulation of the dynamics
+- `rho0`: the initial reduced density matrix
+- `outgroup`: where to store the computed density matrix in the HDF5 file (i.e., the group name)
+
+#### Specifying the initial density matrix
+The simplest way to specify the initial density matrix is to set the `rho0` parameter to a file which will be parsed as a matrix. However, convenient shortcuts exist to specify most commonly used values of `rho0` as shown in the docstring of [QuantumDynamicsCLI.ParseInput.parse_operator](@ref).
+
+```@docs
+QuantumDynamicsCLI.ParseInput.parse_operator
+```
 
 #### Feynman-Vernon Influence Functional Simulations
 There are two ways of incorporating the effect of non-Markovian memory in path integral simulations: iterative propagation beyond memory or using the transfer tensor method. To use TTM, one can choose one of the following:
@@ -85,3 +99,18 @@ bond dimension, `maxdim`, used in obtaining the matrix product state
 representation of the path amplitude tensor are the two parameters that are used
 for controlling the accuracy. The default values of these two parameters are
 $10^{-10}$ and $1000$ respectively.
+
+#### Semiclassical Simulations
+There are principally two mapping Hamiltonian based semiclassical methods that one can choose: the Meyer-Miller-Stock-Thoss mapping based linearized semiclassics and PLDM, and the spin-mapping based versions of these. To use these methods, say `method = "$METHOD"` where `$METHOD` is one of:
+- `LSC` or `PLDM` for the fully or partially linearized semiclassical dynamics using MMST mapping for the system degrees of freedom
+- `Spin-LSC` or `Spin-PLDM` for the corresponding spin-mapped variants
+
+As these methods perform a Monte-Carlo average to calculate the reduced density matrix, the following parameters must be set for all these methods:
+- `num_bins`: the number of independent bins to calculate the average and standard deviation of the observables with
+- `num_mc`: the number of trajectories for each bin
+
+Apart from this, the spin-mapped semiclassical methods offer the choice of choosing the corresponding Stratonovich--Weyl kernel to use for transformation of the Hamiltonian of the system and the initial (reduced) density matrix. This is set by the `SW_transform` keyword, and the supported values are `QTransform`, `PTransform` and `WTransform`. By default, Spin-LSC uses `QTransform` and Spin-PLDM uses `WTransform`. **NOTE:** Spin-PLDM performs poorly with P and Q Stratonovich--Weyl kernels.
+
+Focused initial sampling is only supported by Spin-LSC at the moment. Moreover, only `rho0` of the form $\ket{n}\bra{n}$ are supported currently. Focused sampling may be enabled for such initial reduced density matrices and Spin-LSC by setting the `focused_sampling` parameter to `true`.
+
+These methods _must_ specify the number of discrete oscillators for each `bath` mode via the `num_osc` parameter as specified in the [Bath Hamiltonian](@ref) section above.
